@@ -1,4 +1,0 @@
-c:\users\lukas\onedrive\documents\visual studio 2015\Projects\EntityFrameworkViewMigrations\EntityFrameworkViewMigrations\bin\Debug\EntityFrameworkViewMigrations.dll
-c:\users\lukas\onedrive\documents\visual studio 2015\Projects\EntityFrameworkViewMigrations\EntityFrameworkViewMigrations\bin\Debug\EntityFrameworkViewMigrations.pdb
-c:\users\lukas\onedrive\documents\visual studio 2015\Projects\EntityFrameworkViewMigrations\EntityFrameworkViewMigrations\obj\Debug\EntityFrameworkViewMigrations.dll
-c:\users\lukas\onedrive\documents\visual studio 2015\Projects\EntityFrameworkViewMigrations\EntityFrameworkViewMigrations\obj\Debug\EntityFrameworkViewMigrations.pdb
