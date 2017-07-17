@@ -1,5 +1,7 @@
 # Copyright (c) Designeo s.r.o.  All rights reserved.
 
+$InitialDatabase = '0'
+
 <#
 .SYNOPSIS
     Scaffolds a migration script for any pending model changes.
@@ -87,8 +89,7 @@ function Add-ViewMigration
             [switch] $IgnoreChanges,
 		    [string] $AppDomainBaseDirectory)
 
-    Write-Host "Add EF migration"
-
+    Write-Host "Add EF view migration"
 }
 
 Export-ModuleMember @('Add-ViewMigration') -Variable InitialDatabase
