@@ -72,6 +72,8 @@ function Add-ViewMigration
             [parameter(Position = 0,
                 Mandatory = $true)]
             [string] $Name,
+            [parameter(Mandatory = $true)]
+            [string] $ViewName,
             [switch] $Force,
             [string] $ProjectName,
             [string] $StartUpProjectName,
@@ -87,30 +89,41 @@ function Add-ViewMigration
             [switch] $IgnoreChanges,
 		    [string] $AppDomainBaseDirectory)
 
-    Write-Host "Add EF view migration" -foreground Green
-
-    Write-Host "Add-Migration" -foreground Green
     Add-Migration $Name
+    Add-CommandTypes
 
-    $projectObj = Get-Project
-    Write-Debug "Project path: $projectObj.FullName" -foreground Yellow
+    $command = New-Object EntityFrameworkViewMigrations.PowerShellCommands.Commands.AddViewMigration($dte)
+    $command.SqlViewName = $ViewName
+    $command.Execute()
+}
 
-    $package = Get-Package -ProjectName $projectObj.FullName | ?{ $_.Id -eq 'EntityFrameworkViewMigrations' }
-    $packagePath = Get-PackageInstallPath $package
-    Write-Debug "Package path: $packagePath" -foreground Yellow
+function Add-ModelChangeOnlyMigration
+{
+    [CmdletBinding(DefaultParameterSetName = 'ConnectionStringName')]
+        param (
+            [parameter(Position = 0,
+                Mandatory = $true)]
+            [string] $Name,
+            [switch] $Force,
+            [string] $ProjectName,
+            [string] $StartUpProjectName,
+            [string] $ConfigurationTypeName,
+            [parameter(ParameterSetName = 'ConnectionStringName')]
+            [string] $ConnectionStringName,
+            [parameter(ParameterSetName = 'ConnectionStringAndProviderName',
+                Mandatory = $true)]
+            [string] $ConnectionString,
+            [parameter(ParameterSetName = 'ConnectionStringAndProviderName',
+                Mandatory = $true)]
+            [string] $ConnectionProviderName,
+            [switch] $IgnoreChanges,
+		    [string] $AppDomainBaseDirectory)
 
-    #C:\Users\lukas\Source\Repos\EntityFrameworkViewMigration.Sample\packages\EntityFrameworkViewMigrations.0.0.4.1\lib\net452'
-    $efvDllPath = [io.path]::combine($packagePath, 'lib', 'net452', 'EntityFrameworkViewMigrations.dll')
-    $pscDllPath = [io.path]::combine($packagePath, 'lib', 'net452', 'EntityFrameworkViewMigrations.PowerShellCommands.dll')
-    
-    Write-Debug "EntityFrameworkViewMigrations.dll path: $efvDllPath" -foreground Yellow
-    Write-Debug "EntityFrameworkViewMigrations.PowerShellCommands.dll path: $pscDllPath" -foreground Yellow
+    Add-Migration $Name
+    Add-CommandTypes
 
-    Add-Type -Path $efvDllPath
-    Add-Type -Path $pscDllPath
-
-    $command = New-Object EntityFrameworkViewMigrations.PowerShellCommands.Commands.AddViewMigration;
-    $command.Execute();
+    $command = New-Object EntityFrameworkViewMigrations.PowerShellCommands.Commands.AddModelChangeOnlyDbMigration($dte)
+    $command.Execute()
 }
 
 function Get-PackageInstallPath($package)
@@ -123,7 +136,7 @@ function Get-PackageInstallPath($package)
     return $vsPackage.InstallPath
 }
 
-function Copy-DLL()
+function Copy-DLL
 {
     Write-Host 'Please build EntityFrameworkViewMigrations.PowerShellCommands project'
     Read-Host -Prompt 'Hit enter if everything was done'
@@ -137,4 +150,24 @@ function Write-Debug($text)
     Write-Host "[DEBUG:] $text" -foreground Yellow
 }
 
-Export-ModuleMember @('Add-ViewMigration', 'Copy-DLL', 'Get-PackageInstallPath')
+function Add-CommandTypes
+{
+    $projectObj = Get-Project
+    Write-Debug "Project path: $projectObj.FullName"
+
+    $package = Get-Package -ProjectName $projectObj.FullName | ?{ $_.Id -eq 'EntityFrameworkViewMigrations' }
+    $packagePath = Get-PackageInstallPath $package
+    Write-Debug "Package path: $packagePath"
+
+    #C:\Users\lukas\Source\Repos\EntityFrameworkViewMigration.Sample\packages\EntityFrameworkViewMigrations.{version}\lib\net452'
+    $efvDllPath = [io.path]::combine($packagePath, 'lib', 'net452', 'EntityFrameworkViewMigrations.dll')
+    $pscDllPath = [io.path]::combine($packagePath, 'lib', 'net452', 'EntityFrameworkViewMigrations.PowerShellCommands.dll')
+    
+    Write-Debug "EntityFrameworkViewMigrations.dll path: $efvDllPath" -foreground Yellow
+    Write-Debug "EntityFrameworkViewMigrations.PowerShellCommands.dll path: $pscDllPath" -foreground Yellow
+
+    Add-Type -Path $efvDllPath
+    Add-Type -Path $pscDllPath
+}
+
+Export-ModuleMember @('Add-ViewMigration', 'Add-ModelChangeOnlyMigration', 'Copy-DLL', 'Get-PackageInstallPath')

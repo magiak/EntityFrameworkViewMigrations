@@ -64,7 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\AddEmptyMigration.cs" />
+    <Compile Include="Commands\AddModelChangeOnlyDbMigration.cs" />
     <Compile Include="Commands\AddViewMigration.cs" />
     <Compile Include="Commands\PowerShellCommand.cs" />
     <Compile Include="Commands\IPowerShellCommand.cs" />
@@ -73,6 +73,7 @@
     <Compile Include="Configuration\InitialDataParser.cs" />
     <Compile Include="Configuration\ModelChangeOnlyDbMigration.cs" />
     <Compile Include="Configuration\SqlDataParser.cs" />
+    <Compile Include="Configuration\UpOrDownEnum.cs" />
     <Compile Include="Configuration\ViewMigrationsCodeGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

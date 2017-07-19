@@ -7,6 +7,10 @@ namespace EntityFrameworkViewMigrations.PowerShellCommands.Commands
 {
     public class AddViewMigration : PowerShellCommand
     {
+        public AddViewMigration(object dte) : base(dte)
+        {
+        }
+
         public string SqlViewName { get; set; }
 
         public override void Execute()
@@ -18,32 +22,9 @@ namespace EntityFrameworkViewMigrations.PowerShellCommands.Commands
 
             var textDocument = this.GetActiveDocument();
 
-            this.ChangeBaseType(textDocument);
-            this.AddMissingUsing(textDocument);
+            this.ChangeBaseType(textDocument, nameof(BaseDbMigration));
+            this.AddMissingUsing(textDocument, typeof(BaseDbMigration).Namespace);
             this.InsertDatabaseSqlFileCommands(textDocument);
-
-            Console.WriteLine("DONE YEAH");
-        }
-
-        private void ChangeBaseType(TextDocument textDocument)
-        {
-            // Change from DbMigration to something
-            textDocument.Selection.StartOfDocument();
-            var result = textDocument.Selection.ReplacePattern(nameof(DbMigration), nameof(BaseDbMigration));
-
-            Console.WriteLine("Replaced: " + result);
-        }
-
-        private void AddMissingUsing(TextDocument textDocument)
-        {
-            textDocument.Selection.EndOfDocument();
-            textDocument.Selection.FindText("using", (int)vsFindOptions.vsFindOptionsBackwards);
-            textDocument.Selection.LineDown();
-
-            var @namespace = typeof(BaseDbMigration).Namespace;
-            textDocument.Selection.Insert($"using {@namespace};");
-
-            textDocument.Selection.NewLine();
         }
 
         private void InsertDatabaseSqlFileCommands(TextDocument textDocument)
@@ -65,7 +46,7 @@ namespace EntityFrameworkViewMigrations.PowerShellCommands.Commands
             textDocument.Selection.LineDown();
             textDocument.Selection.NewLine();
 
-            var databaseSqlFileCommand = $"this.{nameof(BaseDbMigration.DatabaseSqlFile)}({this.SqlViewName}{upOrDownString})";
+            var databaseSqlFileCommand = $"this.{nameof(BaseDbMigration.DatabaseSqlFile)}(\"{this.SqlViewName}{upOrDownString}\");";
             textDocument.Selection.Insert(databaseSqlFileCommand);
         }
     }
