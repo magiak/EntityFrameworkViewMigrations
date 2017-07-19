@@ -1,7 +1,5 @@
 # Copyright (c) Designeo s.r.o.  All rights reserved.
 
-$InitialDatabase = '0'
-
 <#
 .SYNOPSIS
     Scaffolds a migration script for any pending model changes.
@@ -89,7 +87,54 @@ function Add-ViewMigration
             [switch] $IgnoreChanges,
 		    [string] $AppDomainBaseDirectory)
 
-    Write-Host "Add EF view migration"
+    Write-Host "Add EF view migration" -foreground Green
+
+    Write-Host "Add-Migration" -foreground Green
+    Add-Migration $Name
+
+    $projectObj = Get-Project
+    Write-Debug "Project path: $projectObj.FullName" -foreground Yellow
+
+    $package = Get-Package -ProjectName $projectObj.FullName | ?{ $_.Id -eq 'EntityFrameworkViewMigrations' }
+    $packagePath = Get-PackageInstallPath $package
+    Write-Debug "Package path: $packagePath" -foreground Yellow
+
+    #C:\Users\lukas\Source\Repos\EntityFrameworkViewMigration.Sample\packages\EntityFrameworkViewMigrations.0.0.4.1\lib\net452'
+    $efvDllPath = [io.path]::combine($packagePath, 'lib', 'net452', 'EntityFrameworkViewMigrations.dll')
+    $pscDllPath = [io.path]::combine($packagePath, 'lib', 'net452', 'EntityFrameworkViewMigrations.PowerShellCommands.dll')
+    
+    Write-Debug "EntityFrameworkViewMigrations.dll path: $efvDllPath" -foreground Yellow
+    Write-Debug "EntityFrameworkViewMigrations.PowerShellCommands.dll path: $pscDllPath" -foreground Yellow
+
+    Add-Type -Path $efvDllPath
+    Add-Type -Path $pscDllPath
+
+    $command = New-Object EntityFrameworkViewMigrations.PowerShellCommands.Commands.AddViewMigration;
+    $command.Execute();
 }
 
-Export-ModuleMember @('Add-ViewMigration') -Variable InitialDatabase
+function Get-PackageInstallPath($package)
+{
+    $componentModel = Get-VsComponentModel
+    $packageInstallerServices = $componentModel.GetService([NuGet.VisualStudio.IVsPackageInstallerServices])
+
+    $vsPackage = $packageInstallerServices.GetInstalledPackages() | ?{ $_.Id -eq $package.Id -and $_.Version -eq $package.Version }
+    
+    return $vsPackage.InstallPath
+}
+
+function Copy-DLL()
+{
+    Write-Host 'Please build EntityFrameworkViewMigrations.PowerShellCommands project'
+    Read-Host -Prompt 'Hit enter if everything was done'
+    $dllPath = 'C:\Users\lukas\Source\Repos\EntityFrameworkViewMigrations\EntityFrameworkViewMigrations.PowerShellCommands\bin\Debug\EntityFrameworkViewMigrations.PowerShellCommands.dll'
+    $targetPath = 'C:\Users\lukas\Source\Repos\EntityFrameworkViewMigration.Sample\packages\EntityFrameworkViewMigrations.0.0.4.1\lib\net452'
+    Copy-Item $dllPath $targetPath -force
+}
+
+function Write-Debug($text)
+{
+    Write-Host "[DEBUG:] $text" -foreground Yellow
+}
+
+Export-ModuleMember @('Add-ViewMigration', 'Copy-DLL', 'Get-PackageInstallPath')

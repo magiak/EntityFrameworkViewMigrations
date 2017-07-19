@@ -47,10 +47,22 @@
     <Folder Include="lib\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="EntityFrameworkViewMigrations.nuspec">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="tools\EntityFrameworkViewMigrations.psd1" />
     <None Include="tools\EntityFrameworkViewMigrations.psm1" />
     <None Include="tools\init.ps1" />
     <None Include="tools\install.ps1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EntityFrameworkViewMigrations.PowerShellCommands\EntityFrameworkViewMigrations.PowerShellCommands.csproj">
+      <Project>{392b69bf-9d3a-499b-b55d-e2d65b0315c8}</Project>
+      <Name>EntityFrameworkViewMigrations.PowerShellCommands</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
