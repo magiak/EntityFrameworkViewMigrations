@@ -5,23 +5,29 @@
     using System.Linq;
     using System.Text.RegularExpressions;
 
-    public static class InitialDataParser
+    public class InitialDataParser
     {
         private static string fileGroup = "filegroup";
+        private readonly DbMigrationPath dbMigrationPath;
 
-        public static IEnumerable<string> Parse()
+        public InitialDataParser(DbMigrationPath dbMigrationPath)
+        {
+            this.dbMigrationPath = dbMigrationPath;
+        }
+
+        public IEnumerable<string> Parse()
         {
             return ParseInitialDataSql()
                 .Cast<Match>()
-                .Select(match => DbMigrationPath.CombineAndReadAll(DbMigrationPath.InitialDataFolderPath, match.Groups[fileGroup].Value))
+                .Select(match => DbMigrationPath.CombineAndReadAll(dbMigrationPath.InitialDataFolderPath, match.Groups[fileGroup].Value))
                 .SelectMany(SqlDataParser.SplitByGoStatements)
                 .Where(sql => !string.IsNullOrWhiteSpace(sql));
         }
 
-        private static MatchCollection ParseInitialDataSql()
+        private MatchCollection ParseInitialDataSql()
         {
             return Regex.Matches(
-                File.ReadAllText(DbMigrationPath.InitialDataSqlPath),
+                File.ReadAllText(dbMigrationPath.InitialDataSqlPath),
                 $@"^\s*:r\s+(?<{fileGroup}>(.+)\.sql)\s*$",
                 RegexOptions.Multiline | RegexOptions.IgnorePatternWhitespace | RegexOptions.IgnoreCase);
         }

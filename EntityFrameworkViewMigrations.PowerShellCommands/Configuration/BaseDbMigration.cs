@@ -1,4 +1,7 @@
-﻿namespace EntityFrameworkViewMigrations.PowerShellCommands.Configuration
+﻿using System;
+using System.Reflection;
+
+namespace EntityFrameworkViewMigrations.PowerShellCommands.Configuration
 {
     using System.Data.Entity.Migrations;
     using System.Data.Entity.Migrations.Infrastructure;
@@ -11,6 +14,8 @@
     {
         private const string DownFileName = "Down";
         private const string UpFileName = "Up";
+        private InitialDataParser initialDataParser;
+        private DbMigrationPath dbMigrationPath;
 
         /// <summary>
         /// Applies sql from sql migration file {sqlFileName}.sql located in
@@ -24,6 +29,28 @@
         /// </param>
         public void DatabaseSqlFile(string sqlFileName, string folder = "", bool suppressTransaction = false)
         {
+            // This is HACK 
+            var assemblyPath = Assembly.GetCallingAssembly().EscapedCodeBase;
+            assemblyPath = assemblyPath.Substring("file:///".Length); // Remove file:///
+
+            var configurationSection = (EntityFrameworkViewMigrationsSection)System.Configuration.ConfigurationManager
+                .OpenExeConfiguration(assemblyPath)
+                .GetSection("entityFrameworkViewMigrations");
+
+            if (configurationSection == null)
+            {
+                string message = $@"SHIT STILL ------------------------------------ :(
+                                    {Assembly.GetCallingAssembly().Location}
+                                    {Assembly.GetCallingAssembly().FullName}
+                                    {Assembly.GetCallingAssembly().EscapedCodeBase}
+                                    {Assembly.GetCallingAssembly().CodeBase}";
+
+                throw new Exception(message);
+            }
+
+            this.dbMigrationPath = new DbMigrationPath(configurationSection.DatabaseProject);
+            this.initialDataParser = new InitialDataParser(this.dbMigrationPath);
+
             this.Sql(SqlDataParser.WrapSqlFileWithExec(this.GetMigrationScript(sqlFileName, folder)), suppressTransaction);
         }
 
@@ -57,7 +84,7 @@
 
         protected void Seed()
         {
-            foreach (string sql in InitialDataParser.Parse())
+            foreach (string sql in this.initialDataParser.Parse())
             {
                 this.Sql(SqlDataParser.WrapSqlFileWithExec(sql));
             }
@@ -76,9 +103,9 @@
         private string GetMigrationScript(string sqlFileName, string folder = "")
         {
             return DbMigrationPath.CombineAndReadAll(
-                DbMigrationPath.MigrationsFolderPath,
+                this.dbMigrationPath.MigrationsFolderPath,
                 ((IMigrationMetadata)this).Id,
-                folder, // I can do this because Path.Combine("Folder1", "", "File"); returns Folder1/File
+                folder, // I can do this because path.Combine("Folder1", "", "File"); returns Folder1/File
                 $"{sqlFileName}.sql");
         }
     }

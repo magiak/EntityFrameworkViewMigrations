@@ -55,6 +55,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -69,7 +70,10 @@
     <Compile Include="Commands\PowerShellCommand.cs" />
     <Compile Include="Commands\IPowerShellCommand.cs" />
     <Compile Include="Configuration\BaseDbMigration.cs" />
+    <Compile Include="Configuration\DatabaseProjectConfigurationElement.cs" />
+    <Compile Include="Configuration\DbMigrationPathConfiguration.cs" />
     <Compile Include="Configuration\DbMigrationPath.cs" />
+    <Compile Include="Configuration\EntityFrameworkViewMigrationsSection.cs" />
     <Compile Include="Configuration\InitialDataParser.cs" />
     <Compile Include="Configuration\ModelChangeOnlyDbMigration.cs" />
     <Compile Include="Configuration\SqlDataParser.cs" />

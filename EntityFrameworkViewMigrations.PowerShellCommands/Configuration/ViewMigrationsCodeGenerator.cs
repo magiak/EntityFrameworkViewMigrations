@@ -9,7 +9,7 @@
     /// Code generator class that modifies the behaviour of
     /// migration scaffolding
     /// </summary>
-    public class TrackCodeGenerator : CSharpMigrationCodeGenerator
+    public class ViewMigrationsCodeGenerator : CSharpMigrationCodeGenerator
     {
         /// <summary>
         /// Generates a namespace, using statements and class definition.

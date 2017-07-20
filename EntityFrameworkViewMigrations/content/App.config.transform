@@ -1,0 +1,14 @@
+﻿<configuration>
+    <configSections>
+      <!-- For more information on Entity Framework View Migrations configuration, visit https://github.com/magiak/EntityFrameworkViewMigrations -->
+      <section name="entityFrameworkViewMigrations" type="EntityFrameworkViewMigrations.PowerShellCommands.Configuration.EntityFrameworkViewMigrationsSection, EntityFrameworkViewMigrations.PowerShellCommands" allowLocation="true" allowDefinition="Everywhere" />
+    </configSections>
+    <entityFrameworkViewMigrations>
+      <databaseProject
+        projectName="EntityFrameworkViewMigration.Database"
+        migrationsFolderName="Migrations"
+        seedFolderName="Seed"
+        seedFileName="Seed.sql"
+      />
+    </entityFrameworkViewMigrations>
+</configuration>

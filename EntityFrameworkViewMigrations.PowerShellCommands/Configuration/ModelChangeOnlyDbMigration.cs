@@ -1,4 +1,6 @@
-﻿namespace EntityFrameworkViewMigrations.PowerShellCommands.Configuration
+﻿using System.Data.Entity.Migrations;
+
+namespace EntityFrameworkViewMigrations.PowerShellCommands.Configuration
 {
     /// <summary>
     /// Use ModelChangeOnlyDbMigration class to mark a dummy
@@ -6,7 +8,7 @@
     /// When using ModelChangeOnlyDbMigration, write a comment
     /// above the derived class and state why you use an empty migration.
     /// </summary>
-    public class ModelChangeOnlyDbMigration : BaseDbMigration
+    public class ModelChangeOnlyDbMigration : DbMigration
     {
         public override void Up()
         {

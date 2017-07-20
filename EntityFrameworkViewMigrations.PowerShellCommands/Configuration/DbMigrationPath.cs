@@ -10,39 +10,46 @@
     /// "ProjectFolder\bin\BuildConfigurationFolder", e.g.
     /// Model\bin\Debug
     /// </summary>
-    public static class DbMigrationPath
+    public class DbMigrationPath
     {
+        private readonly DatabaseProjectConfigurationElement databaseProject;
+
+        public DbMigrationPath(DatabaseProjectConfigurationElement databaseProject)
+        {
+            this.databaseProject = databaseProject;
+        }
+
         /// <summary>
         /// Gets location of the Database project relative to this assembly
         /// after build
         /// </summary>
-        public static string DbProjectPath { get; } = Path.Combine(
+        public string DbProjectPath => Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
-            @"..\..\..\Database\");
+            $@"..\..\..\{databaseProject.ProjectName}\");
 
         /// <summary>
         ///  Gets location of initial data folder in the Database project relative to this assembly
         ///  after build
         /// </summary>
-        public static string InitialDataFolderPath { get; } = Path.Combine(DbProjectPath, "InitialData");
+        public string InitialDataFolderPath => Path.Combine(DbProjectPath, databaseProject.SeedFolderName);
 
         /// <summary>
         /// Gets location of initial data sql file in theDatabase project relative to this assembly
         /// after build
         /// </summary>
-        public static string InitialDataSqlPath { get; } = Path.Combine(InitialDataFolderPath, "InitialData.sql");
+        public string InitialDataSqlPath => Path.Combine(InitialDataFolderPath, databaseProject.SeedFileName);
 
         /// <summary>
         /// Gets location of Migrations folder in the Database project relative to this assembly
         /// after build
         /// </summary>
-        public static string MigrationsFolderPath { get; } = Path.Combine(DbProjectPath, "Migrations");
+        public string MigrationsFolderPath => Path.Combine(DbProjectPath, databaseProject.MigrationsFolderName);
 
         /// <summary>
         /// Combines path parts to a single path and then reads
         /// all text from that path
         /// </summary>
-        /// <param name="paths">Path parts to combine</param>
+        /// <param name="paths">path parts to combine</param>
         /// <returns>String content of a file identified by the paths parts</returns>
         public static string CombineAndReadAll(params string[] paths)
         {
