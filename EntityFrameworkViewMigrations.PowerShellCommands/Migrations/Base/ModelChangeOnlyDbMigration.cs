@@ -1,7 +1,7 @@
-﻿using System.Data.Entity.Migrations;
-
-namespace EntityFrameworkViewMigrations.PowerShellCommands.Configuration
+﻿namespace EntityFrameworkViewMigrations.PowerShellCommands.Migrations.Base
 {
+    using System.Data.Entity.Migrations;
+
     /// <summary>
     /// Use ModelChangeOnlyDbMigration class to mark a dummy
     /// migration that only changes the model but not the database.

@@ -7,6 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFrameworkViewMigratio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFrameworkViewMigrations.PowerShellCommands", "EntityFrameworkViewMigrations.PowerShellCommands\EntityFrameworkViewMigrations.PowerShellCommands.csproj", "{392B69BF-9D3A-499B-B55D-E2D65B0315C8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{13D2C821-2374-49A4-AF6C-363DE38BB47D}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

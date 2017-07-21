@@ -1,10 +1,12 @@
-﻿using EntityFrameworkViewMigrations.PowerShellCommands.Configuration;
-using EnvDTE;
-using System;
-using System.Data.Entity.Migrations;
+﻿using EntityFrameworkViewMigrations.PowerShellCommands.Enums;
 
 namespace EntityFrameworkViewMigrations.PowerShellCommands.Commands
 {
+    using Configuration;
+    using EnvDTE;
+    using System;
+    using Migrations;
+
     public class AddViewMigration : PowerShellCommand
     {
         public AddViewMigration(object dte) : base(dte)

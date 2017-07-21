@@ -1,4 +1,4 @@
-﻿namespace EntityFrameworkViewMigrations.PowerShellCommands.Configuration
+﻿namespace EntityFrameworkViewMigrations.PowerShellCommands.Enums
 {
     public enum UpOrDownEnum
     {

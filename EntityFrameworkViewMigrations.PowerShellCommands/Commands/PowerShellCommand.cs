@@ -1,13 +1,13 @@
-﻿using System;
-using System.Data.Entity.Migrations;
-using EntityFrameworkViewMigrations.PowerShellCommands.Configuration;
-using EnvDTE;
-using EnvDTE80;
-
-namespace EntityFrameworkViewMigrations.PowerShellCommands.Commands
+﻿namespace EntityFrameworkViewMigrations.PowerShellCommands.Commands
 {
+    using System;
+    using System.Data.Entity.Migrations;
+    using EnvDTE;
+    using EnvDTE80;
+
     public abstract class PowerShellCommand : IPowerShellCommand
     {
+        private const int NumberOfUpAndDownSourceLines = 7;
         private readonly DTE2 dte2;
 
         protected PowerShellCommand(object dte)
@@ -48,6 +48,15 @@ namespace EntityFrameworkViewMigrations.PowerShellCommands.Commands
             textDocument.Selection.Insert($"using {missingNamespace};");
 
             textDocument.Selection.NewLine();
+        }
+
+        protected void RemoveUpAndDownFunctions(TextDocument textDocument)
+        {
+            // Find line with UP
+            textDocument.Selection.StartOfDocument();
+            textDocument.Selection.FindText("Up()");
+
+            this.RemoveCurrentLine(textDocument, NumberOfUpAndDownSourceLines);
         }
 
         protected void RemoveCurrentLine(TextDocument textDocument, int numberOfLines = 1)

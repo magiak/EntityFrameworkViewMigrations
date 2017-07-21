@@ -1,10 +1,10 @@
-﻿using System;
-using System.Reflection;
-
-namespace EntityFrameworkViewMigrations.PowerShellCommands.Configuration
+﻿namespace EntityFrameworkViewMigrations.PowerShellCommands.Migrations.Base
 {
+    using System;
     using System.Data.Entity.Migrations;
     using System.Data.Entity.Migrations.Infrastructure;
+    using System.Reflection;
+    using Configuration;
 
     /// <summary>
     /// Base migration class for migration scaffolding
@@ -39,13 +39,7 @@ namespace EntityFrameworkViewMigrations.PowerShellCommands.Configuration
 
             if (configurationSection == null)
             {
-                string message = $@"SHIT STILL ------------------------------------ :(
-                                    {Assembly.GetCallingAssembly().Location}
-                                    {Assembly.GetCallingAssembly().FullName}
-                                    {Assembly.GetCallingAssembly().EscapedCodeBase}
-                                    {Assembly.GetCallingAssembly().CodeBase}";
-
-                throw new Exception(message);
+                throw new Exception("Can not find config file with entityFrameworkViewMigrations section at location {assemblyPath}");
             }
 
             this.dbMigrationPath = new DbMigrationPath(configurationSection.DatabaseProject);

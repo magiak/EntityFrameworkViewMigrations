@@ -1,4 +1,6 @@
-﻿namespace EntityFrameworkViewMigrations.PowerShellCommands.Configuration
+﻿using EntityFrameworkViewMigrations.PowerShellCommands.Migrations;
+
+namespace EntityFrameworkViewMigrations.PowerShellCommands.Configuration
 {
     using System.Collections.Generic;
     using System.Data.Entity.Migrations;

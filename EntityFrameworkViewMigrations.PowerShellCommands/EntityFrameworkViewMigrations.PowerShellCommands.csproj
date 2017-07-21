@@ -65,26 +65,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\AddSeedMigration.cs" />
     <Compile Include="Commands\AddModelChangeOnlyDbMigration.cs" />
     <Compile Include="Commands\AddViewMigration.cs" />
     <Compile Include="Commands\PowerShellCommand.cs" />
     <Compile Include="Commands\IPowerShellCommand.cs" />
-    <Compile Include="Configuration\BaseDbMigration.cs" />
+    <Compile Include="Migrations\Base\BaseDbMigration.cs" />
     <Compile Include="Configuration\DatabaseProjectConfigurationElement.cs" />
-    <Compile Include="Configuration\DbMigrationPathConfiguration.cs" />
     <Compile Include="Configuration\DbMigrationPath.cs" />
     <Compile Include="Configuration\EntityFrameworkViewMigrationsSection.cs" />
-    <Compile Include="Configuration\InitialDataParser.cs" />
-    <Compile Include="Configuration\ModelChangeOnlyDbMigration.cs" />
-    <Compile Include="Configuration\SqlDataParser.cs" />
-    <Compile Include="Configuration\UpOrDownEnum.cs" />
-    <Compile Include="Configuration\ViewMigrationsCodeGenerator.cs" />
+    <Compile Include="Migrations\InitialDataParser.cs" />
+    <Compile Include="Migrations\Base\SeedMigration.cs" />
+    <Compile Include="Migrations\Base\ModelChangeOnlyDbMigration.cs" />
+    <Compile Include="Migrations\SqlDataParser.cs" />
+    <Compile Include="Enums\UpOrDownEnum.cs" />
+    <Compile Include="Migrations\ViewMigrationsCodeGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
