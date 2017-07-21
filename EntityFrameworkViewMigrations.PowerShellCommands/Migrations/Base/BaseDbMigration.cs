@@ -29,13 +29,7 @@
         /// </param>
         public void DatabaseSqlFile(string sqlFileName, string folder = "", bool suppressTransaction = false)
         {
-            // This is HACK 
-            var assemblyPath = Assembly.GetCallingAssembly().EscapedCodeBase;
-            assemblyPath = assemblyPath.Substring("file:///".Length); // Remove file:///
-
-            var configurationSection = (EntityFrameworkViewMigrationsSection)System.Configuration.ConfigurationManager
-                .OpenExeConfiguration(assemblyPath)
-                .GetSection("entityFrameworkViewMigrations");
+            var configurationSection = EntityFrameworkViewMigrationsSection.GetSectionFromCurrentAssembly();
 
             if (configurationSection == null)
             {

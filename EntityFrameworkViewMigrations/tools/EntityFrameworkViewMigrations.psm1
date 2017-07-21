@@ -92,7 +92,8 @@ function Add-ViewMigration
     Add-Migration $Name
     Add-CommandTypes
 
-    $command = New-Object EntityFrameworkViewMigrations.PowerShellCommands.Commands.AddViewMigration($dte)
+    $project = Get-Project
+    $command = New-Object EntityFrameworkViewMigrations.PowerShellCommands.Commands.AddViewDbMigration($dte, $project)
     $command.SqlViewName = $ViewName
     $command.Execute()
 }
@@ -122,7 +123,38 @@ function Add-ModelChangeOnlyMigration
     Add-Migration $Name
     Add-CommandTypes
 
-    $command = New-Object EntityFrameworkViewMigrations.PowerShellCommands.Commands.AddModelChangeOnlyDbMigration($dte)
+    $project = Get-Project
+    $command = New-Object EntityFrameworkViewMigrations.PowerShellCommands.Commands.AddModelChangeOnlyDbMigration($dte, $project)
+    $command.Execute()
+}
+
+function Add-SeedMigration
+{
+    [CmdletBinding(DefaultParameterSetName = 'ConnectionStringName')]
+        param (
+            [parameter(Position = 0,
+                Mandatory = $true)]
+            [string] $Name,
+            [switch] $Force,
+            [string] $ProjectName,
+            [string] $StartUpProjectName,
+            [string] $ConfigurationTypeName,
+            [parameter(ParameterSetName = 'ConnectionStringName')]
+            [string] $ConnectionStringName,
+            [parameter(ParameterSetName = 'ConnectionStringAndProviderName',
+                Mandatory = $true)]
+            [string] $ConnectionString,
+            [parameter(ParameterSetName = 'ConnectionStringAndProviderName',
+                Mandatory = $true)]
+            [string] $ConnectionProviderName,
+            [switch] $IgnoreChanges,
+		    [string] $AppDomainBaseDirectory)
+
+    Add-Migration $Name
+    Add-CommandTypes
+
+    $project = Get-Project
+    $command = New-Object EntityFrameworkViewMigrations.PowerShellCommands.Commands.AddSeedDbMigration($dte, $project)
     $command.Execute()
 }
 
@@ -170,4 +202,4 @@ function Add-CommandTypes
     Add-Type -Path $pscDllPath
 }
 
-Export-ModuleMember @('Add-ViewMigration', 'Add-ModelChangeOnlyMigration', 'Copy-DLL', 'Get-PackageInstallPath')
+Export-ModuleMember @('Add-ViewMigration', 'Add-ModelChangeOnlyMigration', 'Add-SeedMigration', 'Copy-DLL')

@@ -65,17 +65,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\AddSeedMigration.cs" />
+    <Compile Include="Commands\AddSeedDbMigration.cs" />
     <Compile Include="Commands\AddModelChangeOnlyDbMigration.cs" />
-    <Compile Include="Commands\AddViewMigration.cs" />
-    <Compile Include="Commands\PowerShellCommand.cs" />
-    <Compile Include="Commands\IPowerShellCommand.cs" />
+    <Compile Include="Commands\AddViewDbMigration.cs" />
+    <Compile Include="Commands\Base\PowerShellCommand.cs" />
+    <Compile Include="Commands\Base\IPowerShellCommand.cs" />
     <Compile Include="Migrations\Base\BaseDbMigration.cs" />
     <Compile Include="Configuration\DatabaseProjectConfigurationElement.cs" />
     <Compile Include="Configuration\DbMigrationPath.cs" />
     <Compile Include="Configuration\EntityFrameworkViewMigrationsSection.cs" />
     <Compile Include="Migrations\InitialDataParser.cs" />
-    <Compile Include="Migrations\Base\SeedMigration.cs" />
+    <Compile Include="Migrations\Base\SeedDbMigration.cs" />
     <Compile Include="Migrations\Base\ModelChangeOnlyDbMigration.cs" />
     <Compile Include="Migrations\SqlDataParser.cs" />
     <Compile Include="Enums\UpOrDownEnum.cs" />

@@ -1,35 +1,38 @@
-﻿namespace EntityFrameworkViewMigrations.PowerShellCommands.Commands
+﻿namespace EntityFrameworkViewMigrations.PowerShellCommands.Commands.Base
 {
     using System;
     using System.Data.Entity.Migrations;
+    using System.Text.RegularExpressions;
     using EnvDTE;
     using EnvDTE80;
 
     public abstract class PowerShellCommand : IPowerShellCommand
     {
         private const int NumberOfUpAndDownSourceLines = 7;
-        private readonly DTE2 dte2;
+        public DTE2 Dte2 { get; set; }
+        public Project Project { get; set; }
 
-        protected PowerShellCommand(object dte)
+        protected PowerShellCommand(object dte, object project)
         {
-                var dteRef = dte as DTE2;
-                if (dteRef != null)
-                {
-                    this.dte2 = dteRef;
-                    Console.WriteLine("YEAH CASTED");
-                }
-                else
-                {
-                    Console.WriteLine("NOPE NOT CASTED");
-                    this.dte2 = (DTE2)System.Runtime.InteropServices.Marshal.GetActiveObject("VisualStudio.DTE.14.0");
-                }
+            var dteRef = dte as DTE2;
+            if (dteRef != null)
+            {
+                this.Dte2 = dteRef;
+            }
+            else
+            {
+                // TODO Maybe better: (DTE)ServiceProvider.GetService(typeof(DTE));
+                this.Dte2 = (DTE2)System.Runtime.InteropServices.Marshal.GetActiveObject("VisualStudio.DTE.14.0");
+            }
+
+            this.Project = project as Project;
         }
         
         public abstract void Execute();
 
         protected TextDocument GetActiveDocument()
         {
-            return (TextDocument)this.dte2.ActiveDocument.Object(string.Empty);
+            return (TextDocument)this.Dte2.ActiveDocument.Object(string.Empty);
         }
 
         protected void ChangeBaseType(TextDocument textDocument, string newBaseTypeName)

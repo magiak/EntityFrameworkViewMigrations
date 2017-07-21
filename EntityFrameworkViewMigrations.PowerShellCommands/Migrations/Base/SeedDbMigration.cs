@@ -6,7 +6,7 @@
     /// When using ModelChangeOnlyDbMigration, write a comment
     /// above the derived class and state why you use an empty migration.
     /// </summary>
-    public class SeedMigration : BaseDbMigration
+    public class SeedDbMigration : BaseDbMigration
     {
         public override void Up()
         {

@@ -1,12 +1,11 @@
 ﻿namespace EntityFrameworkViewMigrations.PowerShellCommands.Commands
 {
-    using Migrations;
+    using Base;
+    using Migrations.Base;
 
     public class AddModelChangeOnlyDbMigration : PowerShellCommand
     {
-        private const int NumberOfUpAndDownSourceLines = 7;
-
-        public AddModelChangeOnlyDbMigration(object dte) : base(dte)
+        public AddModelChangeOnlyDbMigration(object dte, object project) : base(dte, project)
         {
         }
 
