@@ -1,9 +1,9 @@
-﻿
-namespace EntityFrameworkViewMigrations.PowerShellCommands.Commands
+﻿namespace EntityFrameworkViewMigrations.PowerShellCommands.Commands
 {
     using EnvDTE;
     using System;
     using System.Configuration;
+    using System.IO;
     using System.Linq;
     using Base;
     using Configuration;
@@ -59,8 +59,6 @@ namespace EntityFrameworkViewMigrations.PowerShellCommands.Commands
         // TODO change to private
         public void CreateFilesInMigrationsFolder()
         {
-            System.Diagnostics.Debugger.Launch();
-
             var configuration = EntityFrameworkViewMigrationsSection.GetSectionFromProject(this.Project);
             var databaseProjectConf = configuration.DatabaseProject;
 
@@ -81,23 +79,55 @@ namespace EntityFrameworkViewMigrations.PowerShellCommands.Commands
             }
 
             string folderName = this.GetMigrationFolderName();
-            var folder = databaseProject.ProjectItems.AddFolder(folderName);
-            this.CreateFile(folder, $"{this.SqlViewName}Up.sql", "Empty up"); // TODO better way to create file name
-            this.CreateFile(folder, $"{this.SqlViewName}Down.sql", "Empty down");
+            var folder = migrationsFolder.ProjectItems.AddFolder(folderName);
+
+            string upFileContent = this.GetCurrentViewDefinition(databaseProject);
+            string downFileContent = $"DROP VIEW[dbo].[{this.SqlViewName}]";
+
+            if (folderName.IndexOf("Alter", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                upFileContent = upFileContent.Replace("CREATE VIEW", "ALTER VIEW");
+                downFileContent = upFileContent;
+            }
+
+            // TODO NTH DROP 
+
+            this.CreateFile(folder, $"{this.SqlViewName}Up.sql", upFileContent); // TODO better way to create file name
+            this.CreateFile(folder, $"{this.SqlViewName}Down.sql", downFileContent);
         }
 
         private string GetMigrationFolderName()
         {
-            // Not the best but get it from the current opened file
+            return Path.GetFileNameWithoutExtension(this.GetActiveDocumentNameWithExtension());
+        }
+
+        private string GetActiveDocumentNameWithExtension()
+        {
             return this.Dte2.ActiveDocument.Name;
+        }
+
+        private string GetCurrentViewDefinition(Project databaseProject)
+        {
+            string projectPath = databaseProject.Properties.Cast<Property>().FirstOrDefault(x => x.Name == "FullPath")?.Value.ToString();
+            if (projectPath != null)
+            {
+                string[] allFiles = Directory.GetFiles($@"{projectPath}\dbo\", "*", SearchOption.AllDirectories);
+                var sqlFilePath = allFiles.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x) == this.SqlViewName);
+                if (sqlFilePath != null)
+                {
+                    return File.ReadAllText(sqlFilePath);
+                }
+            }
+
+            return string.Empty;
         }
 
         private void CreateFile(ProjectItem folder, string fileNameWithExtension, string content)
         {
             string folderPath = folder.FileNames[0];
 
-            System.IO.File.AppendAllText(System.IO.Path.Combine(folderPath, fileNameWithExtension), content);
-            var fileFullNames = System.IO.Directory.GetFiles(folderPath);
+            File.AppendAllText(Path.Combine(folderPath, fileNameWithExtension), content);
+            var fileFullNames = Directory.GetFiles(folderPath);
 
             foreach (string fileFullName in fileFullNames)
             {

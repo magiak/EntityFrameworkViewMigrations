@@ -4,10 +4,10 @@
 
     public class DatabaseProjectConfigurationElement : ConfigurationElement
     {
-        private const string ProjectNameKey = "projectName";
-        private const string MigrationsFolderNameKey = "migrationsFolderName";
-        private const string SeedFolderNameKey = "seedFolderName";
-        private const string SeedFileNameKey = "seedFileName";
+        public const string ProjectNameKey = "projectName";
+        public const string MigrationsFolderNameKey = "migrationsFolderName";
+        public const string SeedFolderNameKey = "seedFolderName";
+        public const string SeedFileNameKey = "seedFileName";
 
         [ConfigurationProperty(ProjectNameKey, IsRequired = true)]
         public string ProjectName

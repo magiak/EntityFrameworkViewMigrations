@@ -170,16 +170,22 @@ function Get-PackageInstallPath($package)
 
 function Copy-DLL
 {
+	[CmdletBinding(DefaultParameterSetName = 'ConnectionStringName')]
+        param (
+            [parameter(Position = 0,
+                Mandatory = $true)]
+            [string] $Version)
+
     Write-Host 'Please build EntityFrameworkViewMigrations.PowerShellCommands project'
     Read-Host -Prompt 'Hit enter if everything was done'
     $dllPath = 'C:\Users\lukas\Source\Repos\EntityFrameworkViewMigrations\EntityFrameworkViewMigrations.PowerShellCommands\bin\Debug\EntityFrameworkViewMigrations.PowerShellCommands.dll'
-    $targetPath = 'C:\Users\lukas\Source\Repos\EntityFrameworkViewMigration.Sample\packages\EntityFrameworkViewMigrations.0.0.4.1\lib\net452'
+    $targetPath = "C:\Users\lukas\Source\Repos\EntityFrameworkViewMigration.Sample\packages\EntityFrameworkViewMigrations.$version\lib\net452"
     Copy-Item $dllPath $targetPath -force
 }
 
 function Write-Debug($text)
 {
-    Write-Host "[DEBUG:] $text" -foreground Yellow
+    #Write-Host "[DEBUG:] $text" -foreground Yellow
 }
 
 function Add-CommandTypes

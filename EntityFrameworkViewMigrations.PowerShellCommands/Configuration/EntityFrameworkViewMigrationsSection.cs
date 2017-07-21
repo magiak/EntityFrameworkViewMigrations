@@ -1,9 +1,8 @@
 ﻿namespace EntityFrameworkViewMigrations.PowerShellCommands.Configuration
 {
-    using System;
     using System.Configuration;
-    using System.Reflection;
     using System.Text.RegularExpressions;
+    using System.Xml;
     using EnvDTE;
 
     public class EntityFrameworkViewMigrationsSection : ConfigurationSection
@@ -25,31 +24,39 @@
             }
         }
 
-        public static EntityFrameworkViewMigrationsSection GetSectionFromCurrentAssembly()
-        {
-            // This is HACK 
-            var assemblyPath = Assembly.GetCallingAssembly().EscapedCodeBase;
-            assemblyPath = assemblyPath.Substring("file:///".Length); // Remove file:///
-
-            return (EntityFrameworkViewMigrationsSection) System.Configuration.ConfigurationManager
-                .OpenExeConfiguration(assemblyPath)
-                .GetSection(EntityFrameworkViewMigrationsSectionName);
-        }
-
         public static EntityFrameworkViewMigrationsSection GetSectionFromProject(Project project)
         {
             string configurationFilePath = FindConfigurationFilename(project);
-
-            // Return the configuration object if we have a configuration file name
-            // If we do not have a configuration file name, throw an exception
-            if(!string.IsNullOrEmpty(configurationFilePath))
+            
+            if (!string.IsNullOrEmpty(configurationFilePath))
             {
-                // found it, map it and expose salient members as properties
-                ExeConfigurationFileMap configFile = new ExeConfigurationFileMap { ExeConfigFilename = configurationFilePath };
+                // TODO this is just horrible but i really dont know how to read the app config :(
+                //"C:\\Users\\lukas\\Source\\Repos\\EntityFrameworkViewMigration.Sample\\EntityFrameworkViewMigration.Models\\App.config"
+                //configurationFilePath =
+                //    configurationFilePath.Remove(configurationFilePath.Length - "App.config".Length)
+                //    + "bin\\Debug\\";
 
-                var result = (EntityFrameworkViewMigrationsSection)System.Configuration.ConfigurationManager
-                    .OpenMappedExeConfiguration(configFile, ConfigurationUserLevel.None)
-                    .GetSection(EntityFrameworkViewMigrationsSectionName);
+                // found it, map it and expose salient members as properties
+                //ExeConfigurationFileMap configFile = new ExeConfigurationFileMap { ExeConfigFilename = configurationFilePath + $"{project.Name}.config" };
+                //.OpenMappedExeConfiguration(configFile, ConfigurationUserLevel.None)
+
+                //var result = (EntityFrameworkViewMigrationsSection)System.Configuration.ConfigurationManager
+                //    .OpenExeConfiguration(configurationFilePath + $"{project.Name}.dll")
+                //    .GetSection(EntityFrameworkViewMigrationsSectionName);
+
+                XmlDocument config = new XmlDocument();
+                config.Load(configurationFilePath);
+                var databaseProject = config.DocumentElement.SelectSingleNode("/configuration/entityFrameworkViewMigrations/databaseProject");
+
+                var result = new EntityFrameworkViewMigrationsSection()
+                {
+                    DatabaseProject = new DatabaseProjectConfigurationElement()
+                    {
+                        // TODO all conf or use xml serialization :)
+                        ProjectName = databaseProject.Attributes[DatabaseProjectConfigurationElement.ProjectNameKey].Value,
+                        MigrationsFolderName = databaseProject.Attributes[DatabaseProjectConfigurationElement.MigrationsFolderNameKey].Value,
+                    }
+                };
 
                 return result;
             }

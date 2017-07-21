@@ -29,12 +29,9 @@
         /// </param>
         public void DatabaseSqlFile(string sqlFileName, string folder = "", bool suppressTransaction = false)
         {
-            var configurationSection = EntityFrameworkViewMigrationsSection.GetSectionFromCurrentAssembly();
-
-            if (configurationSection == null)
-            {
-                throw new Exception("Can not find config file with entityFrameworkViewMigrations section at location {assemblyPath}");
-            }
+            var factory = new EntityFrameworkViewMigrationsSectionFactory();
+            var assemblyPath = Assembly.GetCallingAssembly().EscapedCodeBase; // Can not call inside the Factory !!!
+            var configurationSection = factory.GetSectionFromCurrentAssembly(assemblyPath);
 
             this.dbMigrationPath = new DbMigrationPath(configurationSection.DatabaseProject);
             this.initialDataParser = new InitialDataParser(this.dbMigrationPath);
