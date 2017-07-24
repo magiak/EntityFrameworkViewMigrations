@@ -60,28 +60,28 @@
         public void CreateFilesInMigrationsFolder()
         {
             var configuration = EntityFrameworkViewMigrationsSection.GetSectionFromProject(this.Project);
-            var databaseProjectConf = configuration.DatabaseProject;
+            var dbConfiguration = configuration.DatabaseProject;
 
             var databaseProject = this.Dte2.Solution.Projects.Cast<Project>()
-                .FirstOrDefault(x => x.Name == databaseProjectConf.ProjectName);
+                .FirstOrDefault(x => x.Name == dbConfiguration.ProjectName);
 
             if (databaseProject == null)
             {
-                throw new ConfigurationErrorsException($"Unable to find a project {databaseProjectConf.ProjectName}");
+                throw new ConfigurationErrorsException($"Unable to find a project {dbConfiguration.ProjectName}");
             }
 
             var migrationsFolder = databaseProject.ProjectItems.Cast<ProjectItem>()
-                .FirstOrDefault(x => x.Name == databaseProjectConf.MigrationsFolderName);
+                .FirstOrDefault(x => x.Name == dbConfiguration.MigrationsFolderName);
 
             if (migrationsFolder == null)
             {
-                throw new ConfigurationErrorsException($"Unable to find a folder {databaseProjectConf.MigrationsFolderName} inside root of project {databaseProjectConf.ProjectName}");
+                throw new ConfigurationErrorsException($"Unable to find a folder {dbConfiguration.MigrationsFolderName} inside root of project {dbConfiguration.ProjectName}");
             }
 
             string folderName = this.GetMigrationFolderName();
             var folder = migrationsFolder.ProjectItems.AddFolder(folderName);
 
-            string upFileContent = this.GetCurrentViewDefinition(databaseProject);
+            string upFileContent = this.GetCurrentViewDefinition(databaseProject, dbConfiguration);
             string downFileContent = $"DROP VIEW[dbo].[{this.SqlViewName}]";
 
             if (folderName.IndexOf("Alter", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -106,12 +106,15 @@
             return this.Dte2.ActiveDocument.Name;
         }
 
-        private string GetCurrentViewDefinition(Project databaseProject)
+        private string GetCurrentViewDefinition(Project databaseProject, DatabaseProjectConfigurationElement dbConfiguration)
         {
             string projectPath = databaseProject.Properties.Cast<Property>().FirstOrDefault(x => x.Name == "FullPath")?.Value.ToString();
             if (projectPath != null)
             {
-                string[] allFiles = Directory.GetFiles($@"{projectPath}\dbo\", "*", SearchOption.AllDirectories);
+                string[] allFiles = Directory.GetFiles($@"{projectPath}\", "*", SearchOption.AllDirectories)
+                    .Where(x => !x.Contains($@"{projectPath}\{dbConfiguration.MigrationsFolderName}\")) // Exclude the folder with migrations
+                    .Where(x => !x.Contains($@"{projectPath}\{dbConfiguration.SeedFolderName}\")) // Exclude the folder with initil data
+                    .ToArray();
                 var sqlFilePath = allFiles.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x) == this.SqlViewName);
                 if (sqlFilePath != null)
                 {

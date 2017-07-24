@@ -27,4 +27,19 @@ C# Migration code:
 To get more information about the nuget package I would recommend to use the sample project
 https://github.com/magiak/EntityFrameworkViewMigrationsSample
 
-Can't wait to implement v.0.1.0.0! 
+Can't wait to implement v.0.1.0.0!
+
+Developer Feature List:
+
+- Add-ViewMigration (cmdlet) - DONE
+- Add-ModelChangeOnlyMigration (cmdlet) - DONE
+- Add-SeedMigration (cmdlet) - TEST
+- Add-ViewMigration -Alter/Create (cmdlet par) - TODO
+- Add-ViewToExistingMigration -MigrationName -ViewName (cmdlet) - TODO
+- Generate-SqlFile -Up/Down -Refresh (cmdlet) - TODO
+- Delete-ViewFromExistingMigration -MigrationName -ViewName (cmdlet) - TODO
+- Entity Framework POCO generation (package integration) - TODO Priority 1!
+- Up.sql and Down.sql (documentation and sample) - TODO
+- AsNoTracking (documentation and repository) - TODO
+- Procedures (support) - TODO
+- Multiple db schema (support) - TODO

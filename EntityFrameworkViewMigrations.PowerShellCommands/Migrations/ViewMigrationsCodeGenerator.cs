@@ -6,6 +6,7 @@
     using System.Data.Entity.Migrations.Design;
     using System.Data.Entity.Migrations.Utilities;
 
+    // TODO i dont need this class anymore
     /// <summary>
     /// Code generator class that modifies the behaviour of
     /// migration scaffolding
