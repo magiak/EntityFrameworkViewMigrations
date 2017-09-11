@@ -1,6 +1,5 @@
 ﻿namespace EntityFrameworkViewMigrations.PowerShellCommands.Migrations.Base
 {
-    using System;
     using System.Data.Entity.Migrations;
     using System.Data.Entity.Migrations.Infrastructure;
     using System.Reflection;
@@ -29,14 +28,8 @@
         /// </param>
         public void DatabaseSqlFile(string sqlFileName, string folder = "", bool suppressTransaction = false)
         {
-            var factory = new EntityFrameworkViewMigrationsSectionFactory();
-            var assemblyPath = Assembly.GetCallingAssembly().EscapedCodeBase; // Can not call inside the Factory !!!
-            var configurationSection = factory.GetSectionFromCurrentAssembly(assemblyPath);
-
-            this.dbMigrationPath = new DbMigrationPath(configurationSection.DatabaseProject);
-            this.initialDataParser = new InitialDataParser(this.dbMigrationPath);
-
-            this.Sql(SqlDataParser.WrapSqlFileWithExec(this.GetMigrationScript(sqlFileName, folder)), suppressTransaction);
+            var assemblyPath = Assembly.GetCallingAssembly().EscapedCodeBase; // Can not call inside the Factory/Initialize !!!
+            this.DatabaseSqlFile(sqlFileName, folder, suppressTransaction, assemblyPath);
         }
 
         /// <summary>
@@ -50,7 +43,8 @@
         /// </param>
         protected void DatabaseSqlFileUp(bool suppressTransaction = false)
         {
-            this.DatabaseSqlFile(UpFileName, suppressTransaction: suppressTransaction);
+            var assemblyPath = Assembly.GetCallingAssembly().EscapedCodeBase; // Can not call inside the Factory/Initialize !!!
+            this.DatabaseSqlFile(UpFileName, suppressTransaction: suppressTransaction, assemblyPath: assemblyPath);
         }
 
         /// <summary>
@@ -64,15 +58,35 @@
         /// </param>
         protected void DatabaseSqlFileDown(bool suppressTransaction = false)
         {
-            this.DatabaseSqlFile(DownFileName, suppressTransaction: suppressTransaction);
+            var assemblyPath = Assembly.GetCallingAssembly().EscapedCodeBase; // Can not call inside the Factory/Initialize !!!
+            this.DatabaseSqlFile(DownFileName, suppressTransaction: suppressTransaction, assemblyPath: assemblyPath);
         }
 
         protected void Seed()
         {
+            // This is not the best solution... because i can not use the SeedDbMigration. It has wrong calling assemlby :( FUCK THIS SHIT
+            var assemblyPath = Assembly.GetCallingAssembly().EscapedCodeBase; // Can not call inside the Factory/Initialize !!!
+            var factory = new EntityFrameworkViewMigrationsSectionFactory();
+            var configurationSection = factory.GetSectionFromCurrentAssembly(assemblyPath);
+
+            this.dbMigrationPath = new DbMigrationPath(configurationSection.DatabaseProject);
+            this.initialDataParser = new InitialDataParser(this.dbMigrationPath);
+
             foreach (string sql in this.initialDataParser.Parse())
             {
                 this.Sql(SqlDataParser.WrapSqlFileWithExec(sql));
             }
+        }
+
+        private void DatabaseSqlFile(string sqlFileName, string folder = "", bool suppressTransaction = false, string assemblyPath = "")
+        {
+            var factory = new EntityFrameworkViewMigrationsSectionFactory();
+            var configurationSection = factory.GetSectionFromCurrentAssembly(assemblyPath);
+
+            this.dbMigrationPath = new DbMigrationPath(configurationSection.DatabaseProject);
+            this.initialDataParser = new InitialDataParser(this.dbMigrationPath);
+
+            this.Sql(SqlDataParser.WrapSqlFileWithExec(this.GetMigrationScript(sqlFileName, folder)), suppressTransaction);
         }
 
         /// <summary>

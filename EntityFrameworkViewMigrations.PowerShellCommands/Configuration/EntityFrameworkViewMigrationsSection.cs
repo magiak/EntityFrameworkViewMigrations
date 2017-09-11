@@ -24,10 +24,10 @@
             }
         }
 
-        public static EntityFrameworkViewMigrationsSection GetSectionFromProject(Project project)
+        public static XmlDocument GetConfigurationFromProject(Project project)
         {
             string configurationFilePath = FindConfigurationFilename(project);
-            
+
             if (!string.IsNullOrEmpty(configurationFilePath))
             {
                 // TODO this is just horrible but i really dont know how to read the app config :(
@@ -46,22 +46,28 @@
 
                 XmlDocument config = new XmlDocument();
                 config.Load(configurationFilePath);
-                var databaseProject = config.DocumentElement.SelectSingleNode("/configuration/entityFrameworkViewMigrations/databaseProject");
-
-                var result = new EntityFrameworkViewMigrationsSection()
-                {
-                    DatabaseProject = new DatabaseProjectConfigurationElement()
-                    {
-                        // TODO all conf or use xml serialization :)
-                        ProjectName = databaseProject.Attributes[DatabaseProjectConfigurationElement.ProjectNameKey].Value,
-                        MigrationsFolderName = databaseProject.Attributes[DatabaseProjectConfigurationElement.MigrationsFolderNameKey].Value,
-                    }
-                };
-
-                return result;
+                return config;
             }
 
             throw new ConfigurationErrorsException("Unable to find a configuration file (web.config/app.config). If the config file is located in a different project, you must mark that project as either the Startup Project or pass the project location of the config file relative to the solution file.");
+        }
+
+        public static EntityFrameworkViewMigrationsSection GetSectionFromProject(Project project)
+        {
+            var config = GetConfigurationFromProject(project);
+            var databaseProject = config.DocumentElement.SelectSingleNode("/configuration/entityFrameworkViewMigrations/databaseProject");
+
+            var result = new EntityFrameworkViewMigrationsSection()
+            {
+                DatabaseProject = new DatabaseProjectConfigurationElement()
+                {
+                    // TODO all conf or use xml serialization :)
+                    ProjectName = databaseProject.Attributes[DatabaseProjectConfigurationElement.ProjectNameKey].Value,
+                    MigrationsFolderName = databaseProject.Attributes[DatabaseProjectConfigurationElement.MigrationsFolderNameKey].Value,
+                }
+            };
+
+            return result;
         }
 
         // Copy from https://stackoverflow.com/questions/25460348/how-to-make-connection-strings-available-in-a-t4-template
@@ -76,8 +82,7 @@
                 }
             }
 
-            // not found, return null
-            return null;
+            throw new ConfigurationErrorsException("Unable to find a configuration file (web.config/app.config). If the config file is located in a different project, you must mark that project as either the Startup Project or pass the project location of the config file relative to the solution file.");
         }
     }
 }

@@ -85,6 +85,7 @@
     <Compile Include="Commands\AddViewDbMigration.cs" />
     <Compile Include="Commands\Base\PowerShellCommand.cs" />
     <Compile Include="Commands\Base\IPowerShellCommand.cs" />
+    <Content Include="Commands\Generate.sql" />
     <Compile Include="Configuration\EntityFrameworkViewMigrationsSectionFactory.cs" />
     <Compile Include="Migrations\Base\BaseDbMigration.cs" />
     <Compile Include="Configuration\DatabaseProjectConfigurationElement.cs" />

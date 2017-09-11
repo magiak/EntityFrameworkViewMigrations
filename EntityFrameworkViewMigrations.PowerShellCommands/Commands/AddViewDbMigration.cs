@@ -3,6 +3,8 @@
     using EnvDTE;
     using System;
     using System.Configuration;
+    using System.Data;
+    using System.Data.SqlClient;
     using System.IO;
     using System.Linq;
     using Base;
@@ -12,8 +14,11 @@
 
     public class AddViewDbMigration : PowerShellCommand
     {
+        private readonly bool generateModel;
+
         public AddViewDbMigration(object dte, object project) : base(dte, project)
         {
+            this.generateModel = true; // TODO generate model
         }
 
         public string SqlViewName { get; set; }
@@ -31,6 +36,11 @@
             this.AddMissingUsing(textDocument, typeof(BaseDbMigration).Namespace);
             this.InsertDatabaseSqlFileCommands(textDocument);
             this.CreateFilesInMigrationsFolder();
+
+            if (this.generateModel)
+            {
+                this.GenerateModel();
+            }
         }
 
         private void InsertDatabaseSqlFileCommands(TextDocument textDocument)
@@ -56,32 +66,20 @@
             textDocument.Selection.Insert(databaseSqlFileCommand);
         }
 
-        // TODO change to private
-        public void CreateFilesInMigrationsFolder()
+        private void CreateFilesInMigrationsFolder()
         {
-            var configuration = EntityFrameworkViewMigrationsSection.GetSectionFromProject(this.Project);
-            var dbConfiguration = configuration.DatabaseProject;
-
-            var databaseProject = this.Dte2.Solution.Projects.Cast<Project>()
-                .FirstOrDefault(x => x.Name == dbConfiguration.ProjectName);
-
-            if (databaseProject == null)
-            {
-                throw new ConfigurationErrorsException($"Unable to find a project {dbConfiguration.ProjectName}");
-            }
-
-            var migrationsFolder = databaseProject.ProjectItems.Cast<ProjectItem>()
-                .FirstOrDefault(x => x.Name == dbConfiguration.MigrationsFolderName);
+            var migrationsFolder = this.DatabaseProject.ProjectItems.Cast<ProjectItem>()
+                .FirstOrDefault(x => x.Name == this.DatabaseConfiguration.MigrationsFolderName);
 
             if (migrationsFolder == null)
             {
-                throw new ConfigurationErrorsException($"Unable to find a folder {dbConfiguration.MigrationsFolderName} inside root of project {dbConfiguration.ProjectName}");
+                throw new ConfigurationErrorsException($"Unable to find a folder {this.DatabaseConfiguration.MigrationsFolderName} inside root of project {this.DatabaseConfiguration.ProjectName}");
             }
 
             string folderName = this.GetMigrationFolderName();
             var folder = migrationsFolder.ProjectItems.AddFolder(folderName);
 
-            string upFileContent = this.GetCurrentViewDefinition(databaseProject, dbConfiguration);
+            string upFileContent = this.GetCurrentViewDefinition();
             string downFileContent = $"DROP VIEW[dbo].[{this.SqlViewName}]";
 
             if (folderName.IndexOf("Alter", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -106,14 +104,14 @@
             return this.Dte2.ActiveDocument.Name;
         }
 
-        private string GetCurrentViewDefinition(Project databaseProject, DatabaseProjectConfigurationElement dbConfiguration)
+        private string GetCurrentViewDefinition()
         {
-            string projectPath = databaseProject.Properties.Cast<Property>().FirstOrDefault(x => x.Name == "FullPath")?.Value.ToString();
+            string projectPath = this.DatabaseProject.Properties.Cast<Property>().FirstOrDefault(x => x.Name == "FullPath")?.Value.ToString();
             if (projectPath != null)
             {
                 string[] allFiles = Directory.GetFiles($@"{projectPath}\", "*", SearchOption.AllDirectories)
-                    .Where(x => !x.Contains($@"{projectPath}\{dbConfiguration.MigrationsFolderName}\")) // Exclude the folder with migrations
-                    .Where(x => !x.Contains($@"{projectPath}\{dbConfiguration.SeedFolderName}\")) // Exclude the folder with initil data
+                    .Where(x => !x.Contains($@"{projectPath}\{this.DatabaseConfiguration.MigrationsFolderName}\")) // Exclude the folder with migrations
+                    .Where(x => !x.Contains($@"{projectPath}\{this.DatabaseConfiguration.SeedFolderName}\")) // Exclude the folder with initil data
                     .ToArray();
                 var sqlFilePath = allFiles.FirstOrDefault(x => Path.GetFileNameWithoutExtension(x) == this.SqlViewName);
                 if (sqlFilePath != null)
@@ -135,6 +133,26 @@
             foreach (string fileFullName in fileFullNames)
             {
                 folder.ProjectItems.AddFromFile(fileFullName);
+            }
+        }
+
+        private void GenerateModel()
+        {
+            System.Diagnostics.Debugger.Launch();
+
+            var startUpProjectCon = EntityFrameworkViewMigrationsSection.GetConfigurationFromProject(this.StartUpProject);
+            startUpProjectCon.DocumentElement.SelectSingleNode("/configuration/connectionStrings");
+
+            var viewDefinition = this.GetCurrentViewDefinition();
+            //var connectionString = this.GetConnectionString();
+            //var generateCommand = this.GetGenerateCommand();
+
+            // Get conection string
+            using (var connection = new SqlConnection("TODO"))
+            using (var command = new SqlCommand("TODO", connection) { CommandType = CommandType.Text })
+            {
+                connection.Open();
+                command.ExecuteNonQuery();
             }
         }
     }
