@@ -18,7 +18,7 @@
 
         public AddViewDbMigration(object dte, object project) : base(dte, project)
         {
-            this.generateModel = true; // TODO generate model
+            this.generateModel = false; // TODO generate model
         }
 
         public string SqlViewName { get; set; }

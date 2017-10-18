@@ -1,4 +1,5 @@
-﻿DECLARE @TableName sysname = 'Contract'
+﻿-- This script can be used to generate POCO class from database table or view
+DECLARE @TableName sysname = 'TableName' -- REPLACE WITH YOUR TABLE NME
 DECLARE @Result varchar(MAX) = 'public class ' + @TableName + '
 {'
 
