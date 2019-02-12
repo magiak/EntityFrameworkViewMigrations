@@ -1,6 +1,6 @@
 # EntityFrameworkViewMigrations
 
-This NuGet package will add support for the actualization of views and procedures to the Entity Framework.
+This NuGet package will add support for updating views and procedures to the Entity Framework.
 https://www.nuget.org/packages/EntityFrameworkViewMigrations
 
 Version 0.0.6.0 finally provides basic functionality!
